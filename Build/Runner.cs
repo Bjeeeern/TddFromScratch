@@ -62,7 +62,7 @@ public class Runner
             if (allOk)
                 WriteLine(e?.Data, ConsoleColor.Green);
             else if (!dotnetWatchSpam)
-                Console.WriteLine(e?.Data);
+                WriteLine(e?.Data);
         });
 
         process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
@@ -80,7 +80,7 @@ public class Runner
         await process.WaitForExitAsync();
     }
 
-    private static void WriteLine(string? message, ConsoleColor color)
+    private static void WriteLine(string? message, ConsoleColor color = ConsoleColor.Gray)
     {
         Console.ForegroundColor = color;
         Console.WriteLine(message);
