@@ -1,4 +1,7 @@
-﻿using Product;
+﻿using System.Text;
+using Product;
+
+Console.OutputEncoding = Encoding.UTF8;
 
 var userRegister = new UserRegister();
 
