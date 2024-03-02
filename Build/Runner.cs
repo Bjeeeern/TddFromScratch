@@ -57,12 +57,18 @@ public class Runner
         process.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
         {
             var dotnetWatchSpam = e?.Data?.StartsWith("dotnet watch") ?? false;
-            var allOk = e?.Data?.StartsWith("✅ All tests OK ✅") ?? false;
+            if (dotnetWatchSpam) return;
 
-            if (allOk)
-                WriteLine(e?.Data, ConsoleColor.Green);
-            else if (!dotnetWatchSpam)
-                WriteLine(e?.Data);
+            var allOk = e?.Data?.StartsWith("✅ All tests OK ✅") ?? false;
+            var failedTest = e?.Data?.StartsWith("❌") ?? false;
+
+            var color = allOk
+                ? ConsoleColor.Green
+                : failedTest
+                ? ConsoleColor.Red
+                : (ConsoleColor?)null;
+
+            WriteLine(e?.Data, color);
         });
 
         process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
@@ -80,9 +86,9 @@ public class Runner
         await process.WaitForExitAsync();
     }
 
-    private static void WriteLine(string? message, ConsoleColor color = ConsoleColor.Gray)
+    private static void WriteLine(string? message, ConsoleColor? color = null)
     {
-        Console.ForegroundColor = color;
+        Console.ForegroundColor = color ?? ConsoleColor.Gray;
         Console.WriteLine(message);
         Console.ResetColor();
     }
