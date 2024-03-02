@@ -1,5 +1,7 @@
 # TO-DO
 
+## Backend Logic
+
 - account permanence
 - spec generic allowed passwords (configurable with limits)
 - spec generic allowed usernames (configurable with limits)
@@ -16,3 +18,20 @@
 - 2fact (email, mobile)
 - prompt 2fact at login if missing
 - lock account if too many prompts (configurable)
+
+## Backend Integration
+
+- endpoint testing
+- page server testing
+
+## Frontend Logic
+
+- allowed username/password checker
+
+## Frontend UI
+
+- component/css asserts?
+
+## Fullstack Smoketest
+
+- Register user and log out, then log in again
