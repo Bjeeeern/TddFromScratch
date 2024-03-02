@@ -31,7 +31,7 @@ if (exceptions.Any())
 {
     foreach (var exception in exceptions)
     {
-        Console.WriteLine($"❌ {exception.TestMethod}:\n\t{exception.Message}");
+        Console.WriteLine($"❌ {exception.TestMethod}:\n\t{exception.Message}\n\t-> {exception.TestMethodPath}");
     }
 }
 else
