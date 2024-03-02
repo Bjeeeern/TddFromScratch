@@ -1,8 +1,9 @@
 using Framework;
 using Product;
 
-[TestSuite]
-internal static class UserRegisterTests
+namespace TestSuites;
+
+internal static class UserRegistration
 {
     public static void NoUsersExistsInitially()
     {

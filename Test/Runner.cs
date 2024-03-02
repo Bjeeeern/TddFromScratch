@@ -8,7 +8,7 @@ List<AssertException> exceptions = new();
 IEnumerable<Type> testSuites = Assembly
 .GetExecutingAssembly()
 .GetTypes()
-.Where(t => t.CustomAttributes.Any(a => a.AttributeType == typeof(TestSuiteAttribute)));
+.Where(t => t.FullName!.StartsWith("TestSuites."));
 
 foreach (var testSuite in testSuites)
 {
