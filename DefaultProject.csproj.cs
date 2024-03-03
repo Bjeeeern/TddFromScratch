@@ -1,1 +1,4 @@
-﻿await Build.Runner.Run();
+﻿using Build;
+
+var testProject = args.Skip(0).FirstOrDefault() ?? "TestProduct";
+await Builder.Run(testProject);

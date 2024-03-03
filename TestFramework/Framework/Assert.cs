@@ -1,6 +1,6 @@
 namespace Framework;
 
-internal static class Assert
+public static class Assert
 {
     public static void Empty<T>(IEnumerable<T>? enumeration)
     {

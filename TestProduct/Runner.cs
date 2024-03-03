@@ -1,0 +1,3 @@
+﻿using Framework;
+
+TestRunner.Run();

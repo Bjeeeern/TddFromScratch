@@ -3,14 +3,14 @@ using System.Text;
 
 namespace Build;
 
-public class Runner
+public class Builder
 {
-    public static async Task Run()
+    public static async Task Run(string testProject)
     {
         Console.OutputEncoding = Encoding.UTF8;
 
         await CheckVersion();
-        await RunTestWatch();
+        await RunTestWatch(testProject);
     }
 
     private static async Task CheckVersion()
@@ -36,7 +36,7 @@ public class Runner
             throw new Exception($"Expected dotnet version: {expectedVersion}, actual: {actualVersion}");
     }
 
-    private static async Task RunTestWatch()
+    private static async Task RunTestWatch(string testProject)
     {
         WriteLine("⏱  Starting test watch⏱", ConsoleColor.Yellow);
 
@@ -46,7 +46,7 @@ public class Runner
             StartInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = "watch run --project Test --quiet --non-interactive",
+                Arguments = $"watch run --project {testProject} --quiet --non-interactive",
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
