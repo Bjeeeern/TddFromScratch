@@ -9,11 +9,37 @@ public class Builder
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        await CheckVersion();
+        await CheckDotNetVersion();
+        await CheckGitVersion();
+        await RestoreNugetPackages();
+        await CheckForUncommittedNuGetPackages();
         await RunTestWatch(testProject);
     }
 
-    private static async Task CheckVersion()
+    private static async Task CheckGitVersion()
+    {
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "git",
+                Arguments = "--version",
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            }
+        };
+
+        process.Start();
+        var output = process.StandardOutput.ReadToEnd();
+        await process.WaitForExitAsync();
+
+        var actualVersion = output.Split(" ").Last().Trim();
+        var expectedVersion = "2.41.0.windows.3";
+        if (expectedVersion != actualVersion)
+            throw new Exception($"Expected git version: {expectedVersion}, actual: {actualVersion}.");
+    }
+
+    private static async Task CheckDotNetVersion()
     {
         var process = new Process()
         {
@@ -33,7 +59,46 @@ public class Builder
         var actualVersion = Version.Parse(output);
         var expectedVersion = new Version("7.0.401");
         if (expectedVersion != actualVersion)
-            throw new Exception($"Expected dotnet version: {expectedVersion}, actual: {actualVersion}");
+            throw new Exception($"Expected dotnet version: {expectedVersion}, actual: {actualVersion}.");
+    }
+
+    private static async Task RestoreNugetPackages()
+    {
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = @"restore .\AllProjects.sln",
+                CreateNoWindow = true,
+            }
+        };
+
+        process.Start();
+        await process.WaitForExitAsync();
+    }
+
+    private static async Task CheckForUncommittedNuGetPackages()
+    {
+
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "git",
+                Arguments = @"status --short -- packages/",
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            }
+        };
+
+        process.Start();
+        var output = process.StandardOutput.ReadToEnd();
+        await process.WaitForExitAsync();
+
+        var noPackagesAdded = string.IsNullOrEmpty(output);
+        if (!noPackagesAdded)
+            throw new Exception($"NuGet packages has been added to project without being committed.");
     }
 
     private static async Task RunTestWatch(string testProject)

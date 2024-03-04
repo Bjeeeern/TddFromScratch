@@ -8,10 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="TestFramework\**\*" />
-    <Compile Remove="TestProduct\**\*" />
-    <Compile Remove="Product\**\*" />
     <Compile Remove="Build\**\*" />
+    <Compile Remove="TestFramework\**\*" />
+    <Compile Remove="Product\**\*" />
+    <Compile Remove="TestProduct\**\*" />
+    <Compile Remove="Game\**\*" />
+    <Compile Remove="TestGame\**\*" />
     <ProjectReference Include="Build\Build.csproj" />
   </ItemGroup>
 

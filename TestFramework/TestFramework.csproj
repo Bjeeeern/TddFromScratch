@@ -4,6 +4,11 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <DefineConstants>XUNIT_NULLABLE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3.assert.source" Version="0.1.1-pre.367" />
+  </ItemGroup>
 
 </Project>

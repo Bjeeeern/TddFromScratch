@@ -1,16 +1,14 @@
-namespace Framework;
+﻿using Xunit.Sdk;
 
-public static class Assert
+namespace Xunit;
+
+public partial class Assert
 {
-    public static void Empty<T>(IEnumerable<T>? enumeration)
+    public static void GreaterThan<T>(T number, T actual)
+        where T : IComparable<T>
     {
-        if (enumeration?.Any() ?? true)
-            throw new AssertException($"Expected to be empty but found {enumeration?.Count()} elements.");
-    }
-
-    public static void Single<T>(IEnumerable<T>? enumeration)
-    {
-        if (enumeration?.Count() != 1)
-            throw new AssertException($"Expected single element but found {enumeration?.Count()} elements.");
+        if (number.CompareTo(actual) >= 0)
+            throw new XunitException(
+                $"Expected: {actual} > {number}{Environment.NewLine}{new string(' ', 10)}Assert.{nameof(GreaterThan)}() Failure");
     }
 }

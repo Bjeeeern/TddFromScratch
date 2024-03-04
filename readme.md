@@ -1,6 +1,6 @@
-# TO-DO
+## Product TO-DO
 
-## Backend Logic
+### Backend Logic
 
 - account permanence
 - spec generic allowed passwords (configurable with limits)
@@ -19,19 +19,24 @@
 - prompt 2fact at login if missing
 - lock account if too many prompts (configurable)
 
-## Backend Integration
+### Backend Integration
 
 - endpoint testing
 - page server testing
 
-## Frontend Logic
+### Frontend Logic
 
 - allowed username/password checker
 
-## Frontend UI
+### Frontend UI
 
 - component/css asserts?
 
-## Fullstack Smoketest
+### Fullstack Smoketest
 
 - Register user and log out, then log in again
+
+## Game TO-DO
+
+- Index `dotnet-mgcb` etc. tools?
+- Prevent `dotnet-mgcb` from updating `Content/*` when nothing's changed in `Assets/*` instead of using `<Watch Remove="Content\**\*" />` in `Game.csproj`

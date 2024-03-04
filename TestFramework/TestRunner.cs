@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using Xunit.Sdk;
 
 namespace Framework;
 
@@ -9,23 +10,36 @@ public static class TestRunner
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        IEnumerable<Type> testSuites = Assembly
+        var testSuites = Assembly
             .GetCallingAssembly()
             .GetTypes()
-            .Where(t => t.FullName!.StartsWith("TestSuites."));
+            .Where(t => t.IsClass && t.IsVisible && t.FullName!.Contains(nameof(TestSuites)));
 
-        var exceptions = new List<AssertException>();
+        var exceptions = new List<XunitException>();
         foreach (var testSuite in testSuites)
         {
-            var testMethods = testSuite.GetMethods(BindingFlags.Static | BindingFlags.Public);
+            var testMethods = testSuite
+                .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.DeclaringType == testSuite);
             foreach (var testMethod in testMethods)
             {
                 try
                 {
-                    testMethod.Invoke(null, null);
+                    if (testMethod.IsStatic)
+                    {
+                        testMethod.Invoke(null, null);
+                    }
+                    else
+                    {
+                        var instance = testSuite.GetConstructors().Single().Invoke(null);
+                        testMethod.Invoke(instance, null);
+
+                        var disposeMethod = testSuite.GetMethod(nameof(IDisposable.Dispose));
+                        disposeMethod?.Invoke(instance, null);
+                    }
                 }
                 catch (TargetInvocationException outer)
-                when (outer.InnerException is AssertException inner)
+                when (outer.InnerException is XunitException inner)
                 {
                     exceptions.Add(inner);
                 }
@@ -34,7 +48,14 @@ public static class TestRunner
 
         foreach (var exception in exceptions)
         {
-            Console.WriteLine($"❌ {exception.TestMethod}:\n\t{exception.Message}\n\t-> {exception.TestMethodPath}");
+            var messageRows = exception.ToString().Split("\n");
+            var slimmerMessage = string.Join(
+                "\n",
+                Enumerable
+                    .Empty<string>()
+                    .Append(messageRows.First())
+                    .Concat(messageRows.Where(mr => mr.Contains(nameof(TestSuites)))));
+            Console.WriteLine($"❌ {slimmerMessage}");
         }
 
         if (!exceptions.Any())
