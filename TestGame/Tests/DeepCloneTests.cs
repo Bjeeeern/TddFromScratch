@@ -2,7 +2,7 @@ namespace TestSuites;
 
 public class DeepCloneTests
 {
-    public void CanDeepCloneScene()
+    public void CanDeepCloneGenericModel()
     {
         var model = new TestModel
         {

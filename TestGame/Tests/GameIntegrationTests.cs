@@ -37,7 +37,7 @@ public class GameIntegrationTests : IDisposable
         game.RunOneFrame();
     }
 
-    public void AllHandlersInitialize()
+    public void AllHandlersInitializeOnStartup()
     {
         var wrapper = provider.GetRequiredService<XnaGameWrapperService>();
         var handlers = typeof(XnaGameWrapperService)
