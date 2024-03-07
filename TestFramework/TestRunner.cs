@@ -20,7 +20,7 @@ public static class TestRunner
         {
             var testMethods = testSuite
                 .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => m.DeclaringType == testSuite);
+                .Where(m => m.DeclaringType == testSuite && m.Name != nameof(IDisposable.Dispose));
             foreach (var testMethod in testMethods)
             {
                 try
