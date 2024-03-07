@@ -8,7 +8,8 @@ public class StateServiceTests
 
     public StateServiceTests()
     {
-        state = GameServiceCollection.Initialize()
+        state = GameServices.Get()
+            .BuildServiceProvider()
             .GetRequiredService<StateService>();
     }
 

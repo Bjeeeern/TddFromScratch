@@ -11,7 +11,7 @@ public class GameIntegrationTests : IDisposable
 
     public GameIntegrationTests()
     {
-        provider = GameServiceCollection.Initialize();
+        provider = GameServices.Get().BuildServiceProvider();
         game = provider.GetRequiredService<GameService>();
         state = provider.GetRequiredService<StateService>();
 

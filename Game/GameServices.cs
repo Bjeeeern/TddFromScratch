@@ -2,11 +2,10 @@
 
 namespace Game;
 
-public static class GameServiceCollection
+public static class GameServices
 {
-    public static IServiceProvider Initialize()
-    {
-        var services = new ServiceCollection()
+    public static IServiceCollection Get() =>
+        new ServiceCollection()
             .AddSingleton<GraphicsDeviceManager>()
             .AddSingleton<XnaGame, XnaGameWrapperService>()
             .AddSingleton(provider =>
@@ -16,7 +15,4 @@ public static class GameServiceCollection
             })
             .AddSingleton<StateService>()
             .AddSingleton<GameService>();
-
-        return services.BuildServiceProvider();
-    }
 }
