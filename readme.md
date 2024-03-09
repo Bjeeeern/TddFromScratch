@@ -2,7 +2,6 @@
 
 ### Backend Logic
 
-- account permanence
 - spec generic allowed passwords (configurable with limits)
 - spec generic allowed usernames (configurable with limits)
 - login status check

@@ -1,41 +1,48 @@
 using Xunit;
 using Product;
+using Mocks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace TestSuites;
 
-internal static class UserRegistration
+public class UserRegistration
 {
-    public static void NoUsersExistsInitially()
-    {
-        var userRegister = CleanSetup();
+    private readonly IServiceCollection services;
+    private readonly UserService userRegister;
+    private readonly MockStore mockStore = new();
 
+    public UserRegistration()
+    {
+        services = ProductServices.Get()
+            .Replace(ServiceDescriptor.Singleton<IStore>(mockStore));
+        userRegister = services
+            .BuildServiceProvider()
+            .GetRequiredService<UserService>();
+    }
+
+    public void NoUsersExistsInitially()
+    {
         Assert.Empty(userRegister.Users);
     }
 
-    public static void CanRegisterUser()
+    public void CanRegisterUser()
     {
-        var userRegister = CleanSetup();
         userRegister.RegisterUser("test.testsson", "qwerty123456");
 
-        Assert.Single(userRegister.Users);
+        var user = Assert.Single(userRegister.Users);
+        Assert.Equal("test.testsson", user.Name);
     }
 
-    public static void RegisteredUserPersists()
+    public void RegisteredUserPersists()
     {
-        var userRegister = CleanSetup();
         userRegister.RegisterUser("test.testsson", "qwerty123456");
 
-        // reload app
-        userRegister = new UserRegister("tmp");
+        var reloadedUserRegister = services
+            .BuildServiceProvider()
+            .GetRequiredService<UserService>();
 
-        Assert.Single(userRegister.Users);
-    }
-
-    private static UserRegister CleanSetup()
-    {
-        if (Directory.Exists("tmp"))
-            Directory.Delete("tmp", recursive: true);
-
-        return new UserRegister("tmp");
+        Assert.Single(reloadedUserRegister.Users);
+        Assert.Equivalent(userRegister.Users, reloadedUserRegister.Users);
     }
 }

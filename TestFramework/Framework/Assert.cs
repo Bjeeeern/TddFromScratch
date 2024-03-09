@@ -9,6 +9,13 @@ public partial class Assert
     {
         if (number.CompareTo(actual) >= 0)
             throw new XunitException(
-                $"Expected: {actual} > {number}{Environment.NewLine}{new string(' ', 10)}Assert.{nameof(GreaterThan)}() Failure");
+                $"Expected {actual} > {number}");
+    }
+
+    public static void DirectoryExists(string expectedPath)
+    {
+        if (!Directory.Exists(expectedPath))
+            throw new XunitException(
+                $"Expected {expectedPath} to exist");
     }
 }
