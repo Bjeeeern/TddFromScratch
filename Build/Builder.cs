@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Build;
 
@@ -124,12 +125,17 @@ public class Builder
             var dotnetWatchSpam = e?.Data?.StartsWith("dotnet watch") ?? false;
             if (dotnetWatchSpam) return;
 
-            var allOk = e?.Data?.StartsWith("✅ All tests OK ✅") ?? false;
-            var failedTest = e?.Data?.StartsWith("❌") ?? false;
+            var output = e?.Data ?? string.Empty;
+            var allOk = output.StartsWith("✅ All tests OK ✅");
+            var failedTest = output.StartsWith("❌");
+            var buildError = new Regex(@": error \w+: ").IsMatch(output);
+            var buildWarning = new Regex(@": warning \w+: ").IsMatch(output);
 
             var color = allOk
                 ? ConsoleColor.Green
-                : failedTest
+                : buildWarning
+                ? ConsoleColor.Yellow
+                : failedTest | buildError
                 ? ConsoleColor.Red
                 : (ConsoleColor?)null;
 
