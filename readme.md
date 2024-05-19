@@ -1,3 +1,7 @@
+## How to run project
+
+`dotnet run`
+
 ## Product TO-DO
 
 ### Backend Logic
