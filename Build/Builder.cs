@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -12,10 +13,74 @@ public class Builder
 
         await CheckDotNetVersion();
         await CheckGitVersion();
+        await CheckNpmVersion();
         await RestoreNugetPackages();
-        await CheckForUncommittedNuGetPackages();
+        await CheckForPlaywrightInstallation(testProject);
         await RunTestWatch(testProject);
     }
+
+    private static async Task CheckNpmVersion()
+    {
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c npm --version",
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            }
+        };
+
+        process.Start();
+        var output = process.StandardOutput.ReadToEnd();
+        await process.WaitForExitAsync();
+
+        var actualVersion = output.Trim();
+        var expectedVersion = "10.4.0";
+        if (expectedVersion != actualVersion)
+            throw new Exception($"Expected npm version: '{expectedVersion}', actual: '{actualVersion}'.");
+    }
+
+    private async static Task CheckForPlaywrightInstallation(string testProject)
+    {
+        var playwrightBrowserPath = FluentPath.From(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData))
+            .Combine("ms-playwright")
+            .GetFullPath()
+            .Build();
+
+        if (!Directory.Exists(playwrightBrowserPath))
+        {
+            var testProjectBinPath = FluentPath.From(GetCurrentSourceFilePath())
+                .Combine("..", testProject, "bin", "debug")
+                .GetFullPath()
+                .Build();
+
+            if (!File.Exists(testProjectBinPath))
+            {
+                await RunBuild(testProject);
+            }
+
+            var targetFramework = new DirectoryInfo(testProjectBinPath)
+                .GetDirectories()
+                .Select(d => d.Name)
+                .OrderDescending()
+                .First();
+
+            var playwrightSetupPath = FluentPath.From(testProjectBinPath)
+                .Combine(targetFramework, "playwright.ps1")
+                .Build();
+
+            if (!File.Exists(playwrightSetupPath))
+            {
+                throw new Exception($"{playwrightSetupPath} missing.");
+            }
+
+            throw new Exception($"Playwright browsers not installed at '{playwrightBrowserPath}'.\nPlease run {playwrightSetupPath} to install.");
+        }
+    }
+
+    static string GetCurrentSourceFilePath([CallerFilePath] string filePath = "") => Path.GetDirectoryName(filePath)!;
 
     private static async Task CheckGitVersion()
     {
@@ -70,36 +135,13 @@ public class Builder
             StartInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = @"restore .\AllProjects.sln",
+                Arguments = @"restore .\AllProjects.sln --use-lock-file",
                 CreateNoWindow = true,
             }
         };
 
         process.Start();
         await process.WaitForExitAsync();
-    }
-
-    private static async Task CheckForUncommittedNuGetPackages()
-    {
-
-        var process = new Process()
-        {
-            StartInfo = new()
-            {
-                FileName = "git",
-                Arguments = @"status --short -- packages/",
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-            }
-        };
-
-        process.Start();
-        var output = process.StandardOutput.ReadToEnd();
-        await process.WaitForExitAsync();
-
-        var noPackagesAdded = string.IsNullOrEmpty(output);
-        if (!noPackagesAdded)
-            throw new Exception($"NuGet packages has been added to project without being committed.");
     }
 
     private static async Task RunTestWatch(string testProject)
@@ -148,6 +190,34 @@ public class Builder
 
             if (!dotnetWatchSpam)
                 WriteLine(e?.Data, ConsoleColor.Red);
+        });
+
+        process.Start();
+        process.BeginErrorReadLine();
+        process.BeginOutputReadLine();
+
+        await process.WaitForExitAsync();
+    }
+
+    private static async Task RunBuild(string testProject)
+    {
+        var process = new Process()
+        {
+            EnableRaisingEvents = true,
+            StartInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = $"build {testProject}/ --verbosity quiet",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            }
+        };
+
+        process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+        {
+            WriteLine(e?.Data, ConsoleColor.Red);
         });
 
         process.Start();

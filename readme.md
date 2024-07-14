@@ -4,6 +4,13 @@
 
 ## Product TO-DO
 
+Make a online sashiko editor
+
+### Test infrastructure
+
+- playwright + simple server
+- Webasm?
+
 ### Backend Logic
 
 - spec generic allowed passwords (configurable with limits)

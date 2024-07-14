@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net7.0": {
+      "xunit.v3.assert.source": {
+        "type": "Direct",
+        "requested": "[0.1.1-pre.367, )",
+        "resolved": "0.1.1-pre.367",
+        "contentHash": "wUdWe/TqrSDIP+VrWYqmUiTLTyYgR2WM+2ZvsqZgF05AQqSrfpKcGOdW3ONH+CY8il8q9dxokn7g3D8EMcF0mA=="
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net7.0": {
+      "MonoGame.Framework.DesktopGL": {
+        "type": "Direct",
+        "requested": "[3.8.1.303, )",
+        "resolved": "3.8.1.303",
+        "contentHash": "eGYhqn0n1olk8MNYeE9EuBmoNNECN1T18rPMaQpkzsEQ0H3nVyFPXC+uCo78v5pi5juQpJ3PSFnSkjzZJ1U58A=="
+      },
+      "Microsoft.Extensions.DependencyInjection": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "V8S3bsm50ig6JSyrbcJJ8bW2b9QLGouz+G1miK3UTaOWmMtFwNNNzUf4AleyDWUmTrWMLNnFSLEQtxmxgNQnNQ==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "cjWrLkJXK0rs4zofsK4bSdg+jhDLTaxrkXu4gS6Y7MAlCvRyNNgwY/lJi5RDlQOnSZweHqoyvgvbdvQsRIW+hg=="
+      },
+      "MonoGame.Content.Builder.Task": {
+        "type": "Transitive",
+        "resolved": "3.8.1.303",
+        "contentHash": "9Ilzzje62LhWElbPNEl7vh7XsRSbze+lvCJdZtTZUGu48FRgvYN6THURwIB9PN98EI33/Wnf6iuShNUtD7hL4Q=="
+      },
+      "xunit.v3.assert.source": {
+        "type": "Transitive",
+        "resolved": "0.1.1-pre.367",
+        "contentHash": "wUdWe/TqrSDIP+VrWYqmUiTLTyYgR2WM+2ZvsqZgF05AQqSrfpKcGOdW3ONH+CY8il8q9dxokn7g3D8EMcF0mA=="
+      },
+      "game": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection": "[8.0.0, )",
+          "MonoGame.Content.Builder.Task": "[3.8.1.303, )"
+        }
+      },
+      "testframework": {
+        "type": "Project",
+        "dependencies": {
+          "xunit.v3.assert.source": "[0.1.1-pre.367, )"
+        }
+      }
+    }
+  }
+}
