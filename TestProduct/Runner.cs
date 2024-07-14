@@ -1,3 +1,4 @@
 ﻿using Framework;
+using TestSuites;
 
-TestRunner.Run();
+await TestRunner.Run(typeof(HomePage).Assembly);

@@ -6,12 +6,11 @@ namespace Framework;
 
 public static class TestRunner
 {
-    public static void Run()
+    public static async Task Run(Assembly assembly)
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        var testSuites = Assembly
-            .GetCallingAssembly()
+        var testSuites = assembly
             .GetTypes()
             .Where(t => t.IsClass && t.IsVisible && t.FullName!.Contains(nameof(TestSuites)));
 
@@ -25,17 +24,19 @@ public static class TestRunner
             {
                 try
                 {
-                    if (testMethod.IsStatic)
-                    {
-                        testMethod.Invoke(null, null);
-                    }
-                    else
-                    {
-                        var instance = testSuite.GetConstructors().Single().Invoke(null);
-                        testMethod.Invoke(instance, null);
+                    var instance = testMethod.IsStatic
+                        ? null
+                        : testSuite.GetConstructors().Single().Invoke(null);
 
-                        var disposeMethod = testSuite.GetMethod(nameof(IDisposable.Dispose));
-                        disposeMethod?.Invoke(instance, null);
+                    if (testMethod.Invoke(instance, null) is Task task)
+                    {
+                        await task;
+                    }
+
+                    if (instance != null &&
+                        testSuite.GetMethod(nameof(IDisposable.Dispose)) is MethodInfo disposer)
+                    {
+                        disposer.Invoke(instance, null);
                     }
                 }
                 catch (TargetInvocationException outer)
