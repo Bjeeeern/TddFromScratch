@@ -4,7 +4,7 @@ using Mocks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace TestSuites;
+namespace TestSuites.Unit;
 
 public class UserRegistration
 {

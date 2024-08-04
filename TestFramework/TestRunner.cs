@@ -2,15 +2,15 @@
 using System.Text;
 using Xunit.Sdk;
 
-namespace Framework;
+namespace TestFramework;
 
 public static class TestRunner
 {
-    public static async Task Run(Assembly assembly)
+    public static async Task Run()
     {
         Console.OutputEncoding = Encoding.UTF8;
 
-        var testSuites = assembly
+        var testSuites = Assembly.GetEntryAssembly()!
             .GetTypes()
             .Where(t => t.IsClass && t.IsVisible && t.FullName!.Contains(nameof(TestSuites)));
 

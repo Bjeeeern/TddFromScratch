@@ -1,3 +1,1 @@
-﻿using TestSuites;
-
-await TestRunner.Run(typeof(GameIntegrationTests).Assembly);
+﻿await TestFramework.TestRunner.Run();

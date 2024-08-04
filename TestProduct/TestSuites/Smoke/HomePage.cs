@@ -1,7 +1,7 @@
 using Microsoft.Playwright;
 using Xunit;
 
-namespace TestSuites;
+namespace TestSuites.Smoke;
 
 public class HomePage
 {
@@ -15,7 +15,7 @@ public class HomePage
         await using var browser = await playwright.Chromium.LaunchAsync();
 
         var page = await browser.NewPageAsync();
-        var response = await page.GotoAsync("https://google.se");
+        var response = await page.GotoAsync("http://localhost");
 
         Assert.NotNull(response);
         Assert.True(response!.Ok);
