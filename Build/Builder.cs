@@ -7,16 +7,20 @@ namespace Build;
 
 public class Builder
 {
-    public static async Task Run(string testProject)
+    const string TestProject = "TestProduct";
+
+    public static async Task Run()
     {
         Console.OutputEncoding = Encoding.UTF8;
 
         await CheckDotNetVersion();
+        await CheckWasmToolsVersion();
         await CheckGitVersion();
         await CheckNpmVersion();
         await RestoreNugetPackages();
-        await CheckForPlaywrightInstallation(testProject);
-        await RunTestWatch(testProject);
+        await CheckForPlaywrightInstallation();
+        await RunPublish("Client");
+        await RunTestWatch();
     }
 
     private static async Task CheckNpmVersion()
@@ -42,7 +46,7 @@ public class Builder
             throw new Exception($"Expected npm version: '{expectedVersion}', actual: '{actualVersion}'.");
     }
 
-    private async static Task CheckForPlaywrightInstallation(string testProject)
+    private async static Task CheckForPlaywrightInstallation()
     {
         var playwrightBrowserPath = FluentPath.From(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData))
             .Combine("ms-playwright")
@@ -52,13 +56,13 @@ public class Builder
         if (!Directory.Exists(playwrightBrowserPath))
         {
             var testProjectBinPath = FluentPath.From(GetCurrentSourceFilePath())
-                .Combine("..", testProject, "bin", "debug")
+                .Combine("..", TestProject, "bin", "debug")
                 .GetFullPath()
                 .Build();
 
             if (!File.Exists(testProjectBinPath))
             {
-                await RunBuild(testProject);
+                await RunBuild(TestProject);
             }
 
             var targetFramework = new DirectoryInfo(testProjectBinPath)
@@ -123,9 +127,42 @@ public class Builder
         await process.WaitForExitAsync();
 
         var actualVersion = Version.Parse(output);
-        var expectedVersion = new Version("7.0.401");
+        var expectedVersion = new Version("8.0.303");
         if (expectedVersion != actualVersion)
             throw new Exception($"Expected dotnet version: {expectedVersion}, actual: {actualVersion}.");
+    }
+
+    private static async Task CheckWasmToolsVersion()
+    {
+        var process = new Process()
+        {
+            StartInfo = new()
+            {
+                FileName = "dotnet",
+                Arguments = " workload list",
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+            }
+        };
+
+        process.Start();
+        var output = process.StandardOutput.ReadToEnd();
+        await process.WaitForExitAsync();
+
+        var row = output
+            .Split('\n')
+            .Where(l => l.StartsWith("wasm-tools"))
+            .FirstOrDefault() ?? throw new Exception($"No wasm-tools installed.");
+
+        var actualVersion = Regex.Match(row, @"wasm-tools\s+([\d\./]+)\s+").Groups
+            .Cast<Group>()
+            .Skip(1)
+            .Select(g => g.Value)
+            .FirstOrDefault() ?? throw new Exception($"No wasm-tools version match found.");
+
+        var expectedVersion = "8.0.7/8.0.100";
+        if (expectedVersion != actualVersion)
+            throw new Exception($"Expected wasm-tools version: {expectedVersion}, actual: {actualVersion}.");
     }
 
     private static async Task RestoreNugetPackages()
@@ -144,7 +181,7 @@ public class Builder
         await process.WaitForExitAsync();
     }
 
-    private static async Task RunTestWatch(string testProject)
+    private static async Task RunTestWatch()
     {
         WriteLine("⏱  Starting test watch⏱", ConsoleColor.Yellow);
 
@@ -154,7 +191,7 @@ public class Builder
             StartInfo = new()
             {
                 FileName = "dotnet",
-                Arguments = $"watch run --project {testProject} --quiet --non-interactive",
+                Arguments = $"watch run --project {TestProject} --quiet --non-interactive",
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -199,20 +236,52 @@ public class Builder
         await process.WaitForExitAsync();
     }
 
-    private static async Task RunBuild(string testProject)
+    private static async Task RunBuild(string project)
     {
+        var psi = new ProcessStartInfo()
+        {
+            FileName = "dotnet",
+            Arguments = $"build {project}/ --verbosity quiet",
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
         var process = new Process()
         {
             EnableRaisingEvents = true,
-            StartInfo = new()
-            {
-                FileName = "dotnet",
-                Arguments = $"build {testProject}/ --verbosity quiet",
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            }
+            StartInfo = psi,
+        };
+
+        process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
+        {
+            WriteLine(e?.Data, ConsoleColor.Red);
+        });
+
+        process.Start();
+        process.BeginErrorReadLine();
+        process.BeginOutputReadLine();
+
+        await process.WaitForExitAsync();
+    }
+
+    private static async Task RunPublish(string project)
+    {
+        var psi = new ProcessStartInfo()
+        {
+            FileName = "dotnet",
+            Arguments = $"publish {project}/ --verbosity quiet",
+            CreateNoWindow = true,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+
+        var process = new Process()
+        {
+            EnableRaisingEvents = true,
+            StartInfo = psi,
         };
 
         process.ErrorDataReceived += new DataReceivedEventHandler((sender, e) =>
