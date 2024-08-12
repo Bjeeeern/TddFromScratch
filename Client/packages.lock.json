@@ -15,12 +15,6 @@
           "Microsoft.JSInterop.WebAssembly": "8.0.7"
         }
       },
-      "Microsoft.AspNetCore.Components.WebAssembly.DevServer": {
-        "type": "Direct",
-        "requested": "[8.0.7, )",
-        "resolved": "8.0.7",
-        "contentHash": "Op37H355w7cKhtB/tec7/UO/IxTM/TWQq5zw6GcTaLolDWsmnrubdW5j4eINEH+LKLJFuWyOJw/zCLw5mtrL9Q=="
-      },
       "Microsoft.NET.ILLink.Tasks": {
         "type": "Direct",
         "requested": "[8.0.7, )",

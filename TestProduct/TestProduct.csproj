@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.web">
 
   <ItemGroup>
+    <ProjectReference Include="..\Client\Client.csproj" />
     <ProjectReference Include="..\Product\Product.csproj" />
     <ProjectReference Include="..\TestFramework\TestFramework.csproj" />
   </ItemGroup>
