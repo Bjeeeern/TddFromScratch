@@ -15,6 +15,8 @@ public class HomePage
         {
             WebRootPath = "C:/Users/bjeee/source/repos/TDD/Client/bin/Release/net8.0/publish/wwwroot"
         });
+        // TODO: only limit server logs to errors or when debugging
+        builder.Logging.ClearProviders();
         builder.WebHost.UseUrls("http://127.0.0.1:1234");
         builder.Services.AddDirectoryBrowser();
         using var app = builder.Build();
